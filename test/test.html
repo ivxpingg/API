@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>测试</title>
+        <script type="text/javascript" src="./jquery-1.12.0.js">
+
+        </script>
+        <script type="text/javascript">
+             $(document).ready(function(){
+                 $.ajax({
+                     url: "http://localhost:3001/get",
+                     success: function(data){
+                         alert(data);
+                     }
+                 })
+             })
+        </script>
+    </head>
+    <body>
+
+    </body>
+</html>
