@@ -1,7 +1,11 @@
 var koa = require('koa');
 var url = require('url');
-var router = require('koa-router')();
+var Router = require('koa-router');
+var router = new Router({});
 var request = require('koa-request');
+var mountHtml = require('koa-mount-html');
+var server = require('koa-static');
+
 
 var app = koa();
 
@@ -36,16 +40,13 @@ router.get('/api1',function *(tex,req,res){
     yield request(options, callback);
 });
 
-router.get('/',function *(){
-    this.body = "hello";
-});
-router.get('/test',function *(){
-    this.redirect('./test/test');
-    this.status = 200;
-});
 
 app.use(router.routes());
+app.use(mountHtml(function *sendHtml(){
+    yield send(this, '/test.html', { root: __dirname+'/test'},{ defer: true })
+}));
 
+app.use(server('test/'));
 
 
 app.listen(3001);
