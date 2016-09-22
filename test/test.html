@@ -10,6 +10,23 @@
              $(document).ready(function(){
                  $.ajax({
                      url: "http://localhost:3001/get",
+                     data: {a:1,b:2,apiurl:encodeURIComponent('http://www.lccwifi.cn/api/mobile/goods!list.do')},
+                     success: function(data){
+                         console.log(data);
+                     }
+                 });
+
+                 $.ajax({
+                     url: "http://localhost:3001/get/custom",
+                     data: { 'apiurl': encodeURIComponent('test/json/data.json')},
+                     success: function(data){
+                         console.log(data);
+                     }
+                 });
+
+                 $.ajax({
+                     url: "http://localhost:3001/get/custom/page",
+                     data: { 'apiurl': encodeURIComponent('test/json/data.json')},
                      success: function(data){
                          console.log(data);
                      }

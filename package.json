@@ -4,13 +4,15 @@
   "description": "API模拟",
   "main": "server.js",
   "scripts": {
-    "start": "babel-node server.js"
+    "start": "set DEBUG=API* && babel-node  server.js",
+    "debug": "set DEBUG=API* && babel-node server.js --release"
   },
   "babel": {
     "presets": [
       "es2015"
     ],
-    "env": {}
+    "env": {
+    }
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "babel-cli": "^6.14.0",
     "babel-preset-es2015": "^6.14.0",
     "babel-runtime": "^6.11.6",
+    "debug": "^2.2.0",
     "koa": "^1.2.4",
     "koa-mount-html": "^0.1.2",
     "koa-request": "^1.0.0",

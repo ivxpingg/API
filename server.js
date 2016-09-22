@@ -1,53 +1,36 @@
-var koa = require('koa');
-var url = require('url');
-var Router = require('koa-router');
-var router = new Router({});
-var request = require('koa-request');
-var mountHtml = require('koa-mount-html');
-var server = require('koa-static');
+import koa from 'koa';
+import statics from 'koa-static';
+import router from './server/router';
+import Boom from 'boom';
 
+const app = koa();
 
-var app = koa();
+var debug = require('debug')('API:server');
 
-router.get('/get',function *(){
-    var options = {
-    	url: 'http://www.lccwifi.cn/api/mobile/goods!list.do',
-        headers: { 'User-Agent': 'request' }
-    };
+debug('test');
 
-    var response = yield request(options); //Yay, HTTP requests with no callbacks!
-    var info = JSON.parse(response.body);
-    this.body = info;
+const DEBUG = !process.argv.includes('--release');
+process.env.NODE_ENV = DEBUG ? '"development"' : '"production"';
 
+console.log(process.env.NODE_ENV);
+
+app.use(router.routes(), router.allowedMethods({
+    throw: true,
+    notImplemented: () => new Boom.notImplemented(),
+    methodNotAllowed: () => new Boom.methodNotAllowed()
+}));   //
+
+app.use(function *(next){
+    console.log('进入');
+    yield next;
 });
 
-router.get('/api1',function *(tex,req,res){
-    var options = {
-        url: 'http://www.lccwifi.cn/api/mobile/goods!list.do',
-        headers: {
-          'User-Agent': 'request'
-        }
-      };
+app.use(statics('test/'));  //设置静态目录
 
-    function callback(error, response, body) {
-        if (!error && response.statusCode == 200) {
-          var info = JSON.parse(body);
-          this.body= body;
-      } else {
-          console.log(1112);
-      }
-    }
-    yield request(options, callback);
+app.on('error', function(err, ctx){
+    console.log("fdfdfd");
+    log.error("server error", err, ctx);
 });
-
-
-app.use(router.routes());
-app.use(mountHtml(function *sendHtml(){
-    yield send(this, '/test.html', { root: __dirname+'/test'},{ defer: true })
-}));
-
-app.use(server('test/'));
-
 
 app.listen(3001);
 
