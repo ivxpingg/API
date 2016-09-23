@@ -3,6 +3,7 @@ import url from 'url';
 import querystring from 'querystring';
 import request from 'koa-request';
 import fs from 'fs';
+import path from 'path';
 
 const debug = require('debug')('router:local');
 
@@ -27,9 +28,15 @@ router.get('/get',  function *() {
     this.body = info;
 });
 
-//调用本地模拟数据
-//
+
+/**
+ * [调用本地模拟数据]
+ * @param  {[String]} fileUrl [文件路径,相对路径]
+ * @param  {[Int]} ms      [延迟时间，毫秒]
+ * @return {[Object]}         [description]
+ */
 var fn = function(fileUrl,ms){
+    var ms = ms || 0
     return new Promise((resolve, reject) =>{
         try{
             setTimeout(function(){
@@ -37,7 +44,7 @@ var fn = function(fileUrl,ms){
                 //const response = yield request(options);
                 let info = JSON.parse(response);
                 resolve(info);
-            }, 5000);
+            }, ms);
 
         } catch(e) {
             reject();
@@ -45,11 +52,12 @@ var fn = function(fileUrl,ms){
 
     });
 }
+
 router.get('/get/custom',  function *() {
     const query = url.parse(this.url,true).query;
     const fileUrl = querystring.unescape(query.apiurl);
-
-    const relval = yield fn(fileUrl);
+    const ms = querystring.unescape(query.ms);
+    const relval = yield fn(fileUrl,ms);
 
     this.body = relval;
 
@@ -75,5 +83,72 @@ router.get('/get/custom/page',  function *() {
 
      this.body = relValue;
 });
+
+
+let getStaticMenu = function(){
+    return new Promise((resolve, reject) => {
+        try{
+            let paths = "../src";  // 要获取的目录
+            let dirs = [];  //存储目录变量
+
+            let traversal = function(url,dir){
+                let moduleFile = path.join(__dirname, url);
+                let modules = fs.readdirSync(moduleFile);
+                console.log(modules);
+                modules.forEach(item => {
+                    let file = {
+                        name: "",
+                        isFolder: true,
+                        url: url,
+                        dir: []
+                    };
+                    file.name = item;
+                    if(item.indexOf('.') == -1) {
+                        file.isFolder = true;
+                        traversal(url + '/' + item, file.dir);
+                    } else {
+                        file.isFolder = false;
+                    }
+                    dir.push(file);
+                });
+            };
+
+            traversal(paths, dirs);
+              console.log(dirs);
+            resolve(dirs);
+        } catch(e) {
+            reject();
+        }
+
+    });
+};
+/**
+ * 获取浏览目录
+ * @return {[Object]}
+ * [
+ *   {
+ *     name: 'item1',
+ *     isFolder: true,
+ *     url: '../src',
+ *     dir: [
+ *            {
+ *              name: index.html,
+ *              isFolder: false,
+ *              url: '../src/item1'
+ *            }
+ *          ]
+ *   }, {
+ *     name:
+ *     ..
+ *   }
+ * ]
+ */
+router.get('/menu', function *(){
+    console.log(11);
+    let reVal = yield getStaticMenu();
+    this.body = reVal;
+});
+
+
 
 export default router;

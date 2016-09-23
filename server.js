@@ -2,6 +2,7 @@ import koa from 'koa';
 import statics from 'koa-static';
 import router from './server/router';
 import Boom from 'boom';
+import {port,host} from './config';
 
 const app = koa();
 
@@ -28,10 +29,12 @@ app.use(function *(next){
 app.use(statics('test/'));  //设置静态目录
 
 app.on('error', function(err, ctx){
-    console.log("fdfdfd");
+    console.error(err);
     log.error("server error", err, ctx);
 });
 
-app.listen(3001);
+app.listen(port,() => {
+    console.log(`The server is running at ${host}`);
+  });
 
 export default app;

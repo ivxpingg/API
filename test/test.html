@@ -30,6 +30,13 @@
                      success: function(data){
                          console.log(data);
                      }
+                 });
+                 $.ajax({
+                     url: "http://localhost:3001/menu",
+                     data: { },
+                     success: function(data){
+                         console.log(data);
+                     }
                  })
              })
         </script>
